@@ -36,6 +36,14 @@ int main()
     shared_data *ptr;
     const char *name = "HW2";
     
+    shm_fd = shm_open(name, O_CREAT|O_RDWR, 0666);
+    ftruncate(shm_fd, sizeof(shared_data));
+    ptr = (shared_data*)mmap(0, sizeof(shared_data), PROT_WRITE, MAP_SHARED, shm_fd, 0);
+
+    int n = 0;
+    scanf("%d", &n);
+    ptr->seq_size = n;
+
     pid_t pid;
     pid = fork();
     
@@ -56,13 +64,7 @@ int main()
         }
     }
     else{
-        shm_fd = shm_open(name, O_CREAT|O_RDWR, 0666);
-        ftruncate(shm_fd, sizeof(shared_data));
-        ptr = (shared_data*)mmap(0, sizeof(shared_data), PROT_WRITE, MAP_SHARED, shm_fd, 0);
-
-        int n = 0;
-        scanf("%d", &n);
-        ptr->seq_size = n;
+        
         wait(NULL);
         if(n > 10 || n < 0)
         {
