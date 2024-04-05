@@ -5,7 +5,7 @@
 #include <sys/shm.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <sys/type.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -22,7 +22,7 @@ int fibonacci(int n){
     return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     pid_t pid;
     pid = fork();
@@ -31,8 +31,7 @@ int main()
         return 1;
     }
     else if (pid == 0){
-        int n = 0;
-        scanf("%d", &n);
+        int n = atoi(argv[1]);
         for(int i = 0; i < n; i++)
         {
             printf("%d ",fibonnacci(i));

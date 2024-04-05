@@ -30,7 +30,7 @@ int fibonacci(int n){
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
     int shm_fd;
     shared_data *ptr;
@@ -40,8 +40,7 @@ int main()
     ftruncate(shm_fd, sizeof(shared_data));
     ptr = (shared_data*)mmap(0, sizeof(shared_data), PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
-    int n = 0;
-    scanf("%d", &n);
+    int n = atoi(argv[1]);
     ptr->seq_size = n;
 
     pid_t pid;
@@ -81,3 +80,4 @@ int main()
     }
 return 0;
 }
+
