@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     char buffer[BUF_SIZE];
     int fd[2];
     pid_t pid;
-    ssize_t bytes_read, bytes_written;
+    ssize_t bytes_read;
 
     if(pipe(fd) == -1)
     {
@@ -33,37 +33,40 @@ int main(int argc, char *argv[])
     else if (pid == 0)
     {
         close(fd[1]);
-        int txtfile = open(argv[2], O_CREAT|O_RDWR);
-        while ((bytes_read = read(fd[0], buffer, BUF_SIZE)) > 0) 
-        {
-            bytes_written = write(txtfile, buffer, bytes_read);
-            if (bytes_written == -1) 
-            {
-                printf("writed\n");
-                close(fd[0]);
-                close(txtfile);
+        FILE *dest_file = fopen(argv[2], "w");
+        
+        while ((bytes_read = read(fd[0], buffer, BUF_SIZE)) > 0) {
+            if (fwrite(buffer, 1, bytes_read, dest_file) != bytes_read) {
+                printf("child error\n");
+                return 0;
             }
         }
+        close(fd[0]);
+        fclose(dest_file);
     }
     else
     {
         close(fd[0]);
-        int txtfile = open(argv[1], O_RDONLY);
-        if(txtfile == -1)
-        {
+        FILE *src_file = fopen(argv[1], "r");
+        if (src_file == NULL) {
             fprintf(stderr, "read file failed");
             return 1;
         }
-        while ((bytes_read = read(txtfile, buffer, BUF_SIZE)) > 0) 
-        {
-            bytes_written = write(fd[1], buffer, bytes_read);
-            if (bytes_written == -1) 
-            {
-                printf("writing\n");
-                close(fd[1]);
-                close(txtfile);
+        while ((bytes_read = fread(buffer, 1, BUF_SIZE, src_file)) > 0) {
+            ssize_t bytes_written = write(fd[1], buffer, bytes_read);
+            if (bytes_written != bytes_read) {
+                if (bytes_written == -1) {
+                    printf("parent error\n");
+                } else {
+                    printf( "Error: Could not write all bytes to pipe.\n");
+                }
+                return 0;
             }
         }
+
+        close(fd[1]);
+        fclose(src_file);
+        wait(NULL);
     }
     return 0;
 }
