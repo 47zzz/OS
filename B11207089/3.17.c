@@ -36,18 +36,20 @@ int main(int argc, char *argv[])
     shared_data *ptr;
     const char *name = "HW2";
     
+    int n = atoi(argv[1]);
+    if(n > MAX_SEQUENCE || n < 0)
+        {
+            printf("Please entry a number less than MAX_SEQUENCE\n");
+            return 0;
+        }
+    
     shm_fd = shm_open(name, O_CREAT|O_RDWR, 0666);
     ftruncate(shm_fd, sizeof(shared_data));
     ptr = (shared_data*)mmap(0, sizeof(shared_data), PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
-    int n = atoi(argv[1]);
- 
+
     ptr->seq_size = n;
-    if(n > 10 || n < 0)
-        {
-            printf("Please entry a number less than 10\n");
-            return 0;
-        }
+
 
 
     pid_t pid;
