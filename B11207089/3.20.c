@@ -32,6 +32,21 @@ int main(int argc, char *argv[])
     }
     else if (pid == 0)
     {
+        close(fd[1]);
+        int txtfile = open(argv[2], O_CREAT|O_RDWR);
+        while ((bytes_read = read(fd[0], buffer, BUF_SIZE)) > 0) 
+        {
+            bytes_written = write(txtfile, buffer, bytes_read);
+            if (bytes_written == -1) 
+            {
+                printf("writed\n");
+                close(fd[0]);
+                close(txtfile);
+            }
+        }
+    }
+    else
+    {
         close(fd[0]);
         int txtfile = open(argv[1], O_RDONLY);
         if(txtfile == -1)
@@ -50,21 +65,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-    else
-    {
-        close(fd[1]);
-        int txtfile = open(argv[2], O_CREAT|O_RDWR);
-        while ((bytes_read = read(fd[0], buffer, BUF_SIZE)) > 0) 
-        {
-            bytes_written = write(txtfile, buffer, bytes_read);
-            if (bytes_written == -1) 
-            {
-                printf("writed\n");
-                close(fd[0]);
-                close(txtfile);
-            }
-        }
-        printf("Child Complete\n");
-    }
     return 0;
 }
+       

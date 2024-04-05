@@ -43,7 +43,12 @@ int main(int argc, char *argv[])
     int n = atoi(argv[1]);
  
     ptr->seq_size = n;
-   
+    if(n > 10 || n < 0)
+        {
+            printf("Please entry a number less than 10\n");
+            return 0;
+        }
+
 
     pid_t pid;
     pid = fork();
@@ -54,14 +59,6 @@ int main(int argc, char *argv[])
     }
     else if (pid == 0){
         
-    shm_fd = shm_open(name, O_CREAT|O_RDWR, 0666);
-        ptr = (shared_data*)mmap(0, sizeof(shared_data), PROT_WRITE, MAP_SHARED, shm_fd, 0);
-        
-    
-    if(ptr->seq_size > 10 || ptr->seq_size < 0)
-        {
-            return 0;
-        }
         for(int i = 0; i < ptr->seq_size; i++)
         {
             ptr->fib_seq[i] = fibonacci(i);
@@ -72,18 +69,12 @@ int main(int argc, char *argv[])
         
         wait(NULL);
         
-    if(n > 10 || n < 0)
-        {
-            printf("Please entry a number less than 10\n");
-            return 0;
-        }
 
         for(int i = 0; i < ptr->seq_size; i++)
         {
             printf("%ld ",ptr->fib_seq[i]);
         }
     
-        printf("Child Complete\n");
         shm_unlink(name);
     }
 return 0;
