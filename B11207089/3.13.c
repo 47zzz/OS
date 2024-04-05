@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         int n = atoi(argv[1]);
         for(int i = 0; i < n; i++)
         {
-            printf("%d ",fibonnacci(i));
+            printf("%d ",fibonacci(i));
         }
     }
     else{
